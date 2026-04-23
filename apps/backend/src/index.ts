@@ -3,6 +3,10 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import pool from './models/db';
 import authRoutes from './routes/authRoutes';
+import userRoutes from './routes/userRoutes';
+import attendanceRoutes from './routes/attendanceRoutes';
+import leaveRoutes from './routes/leaveRoutes';
+import overtimeRoutes from './routes/overtimeRoutes';
 
 dotenv.config();
 
@@ -23,6 +27,10 @@ app.get('/api/health', async (_req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/attendance', attendanceRoutes);
+app.use('/api/leave', leaveRoutes);
+app.use('/api/overtime', overtimeRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
