@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import pool from './models/db';
+import authRoutes from './routes/authRoutes';
 
 dotenv.config();
 
@@ -20,6 +21,8 @@ app.get('/api/health', async (_req, res) => {
     res.status(500).json({ success: false, message: 'DB connection failed', error: String(err) });
   }
 });
+
+app.use('/api/auth', authRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
