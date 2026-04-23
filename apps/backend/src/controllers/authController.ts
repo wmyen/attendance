@@ -29,6 +29,15 @@ export async function refreshTokenHandler(req: Request, res: Response): Promise<
   res.json({ success: true, data: result });
 }
 
+export async function getProfileHandler(req: Request, res: Response): Promise<void> {
+  const profile = await authService.getProfile(req.user!.userId);
+  if (!profile) {
+    res.status(404).json({ success: false, message: '找不到使用者' });
+    return;
+  }
+  res.json({ success: true, data: profile });
+}
+
 export async function changePasswordHandler(req: Request, res: Response): Promise<void> {
   const userId = req.user!.userId;
   const { oldPassword, newPassword } = req.body;

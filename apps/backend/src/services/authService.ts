@@ -38,6 +38,14 @@ export async function refreshTokens(token: string): Promise<{ accessToken: strin
   }
 }
 
+export async function getProfile(userId: number): Promise<RowDataPacket | null> {
+  const [rows] = await pool.query<RowDataPacket[]>(
+    'SELECT id, email, name, role, must_change_password FROM users WHERE id = ? AND is_active = TRUE',
+    [userId]
+  );
+  return rows[0] || null;
+}
+
 export async function changePassword(userId: number, oldPassword: string, newPassword: string): Promise<boolean> {
   const [rows] = await pool.query<RowDataPacket[]>(
     'SELECT password_hash FROM users WHERE id = ?',
