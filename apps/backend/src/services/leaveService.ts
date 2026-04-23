@@ -24,6 +24,14 @@ export async function getLeaveTypes(): Promise<RowDataPacket[]> {
 
 export async function getLeaveBalances(userId: number, year?: number): Promise<RowDataPacket[]> {
   const y = year || new Date().getFullYear();
+
+  const [userRows] = await pool.query<RowDataPacket[]>(
+    'SELECT hire_date FROM users WHERE id = ?', [userId]
+  );
+  if (userRows.length > 0) {
+    await ensureAnnualLeaveBalance(userId, userRows[0].hire_date);
+  }
+
   const [rows] = await pool.query<RowDataPacket[]>(
     `SELECT lb.*, lt.name as leave_type_name, lt.is_paid
      FROM leave_balances lb

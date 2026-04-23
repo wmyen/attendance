@@ -2,7 +2,12 @@ import { RowDataPacket } from 'mysql2';
 import pool from '../models/db';
 import { verifyPassword, hashPassword } from '../utils/password';
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken, TokenPayload } from '../utils/jwt';
-import { LoginResponse } from '../../../packages/shared/src';
+interface LoginResponse {
+  accessToken: string;
+  refreshToken: string;
+  mustChangePassword: boolean;
+  user: { id: number; email: string; name: string; role: string };
+}
 
 export async function login(email: string, password: string): Promise<LoginResponse | null> {
   const [rows] = await pool.query<RowDataPacket[]>(
