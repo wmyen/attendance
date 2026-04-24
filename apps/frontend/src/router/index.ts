@@ -36,6 +36,21 @@ const routes = [
         component: () => import('../views/MonthlyAttendance.vue'),
       },
       {
+        path: 'attendance/correction/apply',
+        name: 'CorrectionApply',
+        component: () => import('../views/attendance/CorrectionApply.vue'),
+      },
+      {
+        path: 'attendance/correction/records',
+        name: 'CorrectionRecords',
+        component: () => import('../views/attendance/CorrectionRecords.vue'),
+      },
+      {
+        path: 'attendance/correction/approvals',
+        name: 'CorrectionApprovals',
+        component: () => import('../views/attendance/CorrectionApprovals.vue'),
+      },
+      {
         path: 'leave/apply',
         name: 'LeaveApply',
         component: () => import('../views/leave/LeaveApply.vue'),

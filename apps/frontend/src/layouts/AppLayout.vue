@@ -49,6 +49,16 @@ async function handleLogout() {
           <template #title>月度出勤</template>
         </el-menu-item>
 
+        <el-sub-menu index="correction">
+          <template #title>
+            <el-icon><Stamp /></el-icon>
+            <span>打卡補登</span>
+          </template>
+          <el-menu-item index="/attendance/correction/apply">申請補登/更正</el-menu-item>
+          <el-menu-item index="/attendance/correction/records">補登紀錄</el-menu-item>
+          <el-menu-item index="/attendance/correction/approvals">補登簽核</el-menu-item>
+        </el-sub-menu>
+
         <el-sub-menu index="leave">
           <template #title>
             <el-icon><Document /></el-icon>

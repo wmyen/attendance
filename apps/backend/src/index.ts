@@ -7,6 +7,7 @@ import userRoutes from './routes/userRoutes';
 import attendanceRoutes from './routes/attendanceRoutes';
 import leaveRoutes from './routes/leaveRoutes';
 import overtimeRoutes from './routes/overtimeRoutes';
+import correctionRoutes from './routes/correctionRoutes';
 
 dotenv.config();
 
@@ -31,6 +32,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/attendance', attendanceRoutes);
 app.use('/api/leave', leaveRoutes);
 app.use('/api/overtime', overtimeRoutes);
+app.use('/api/attendance/corrections', correctionRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

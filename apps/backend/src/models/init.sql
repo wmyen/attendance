@@ -106,6 +106,26 @@ CREATE TABLE IF NOT EXISTS password_reset_tokens (
   FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
+CREATE TABLE IF NOT EXISTS attendance_correction_requests (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  date DATE NOT NULL,
+  correction_type ENUM('missed_clock_in', 'missed_clock_out', 'correct_clock_in', 'correct_clock_out') NOT NULL,
+  original_time DATETIME,
+  requested_time DATETIME NOT NULL,
+  reason TEXT,
+  status ENUM('pending', 'approved', 'rejected', 'cancelled') DEFAULT 'pending',
+  approver_id INT,
+  approved_at DATETIME,
+  rejection_reason TEXT,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id),
+  FOREIGN KEY (approver_id) REFERENCES users(id) ON DELETE SET NULL,
+  INDEX idx_user_status (user_id, status),
+  INDEX idx_approver_status (approver_id, status)
+);
+
 INSERT IGNORE INTO leave_types (id, name, is_paid, requires_document, auto_calculate) VALUES
   (1, '年假', TRUE, FALSE, TRUE),
   (2, '事假', FALSE, FALSE, FALSE),
