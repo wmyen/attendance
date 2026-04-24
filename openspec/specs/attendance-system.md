@@ -1,8 +1,8 @@
 # 出缺勤管理系統 — 系統規格 (System Specification)
 
-> **版本**: 1.0
+> **版本**: 1.1
 > **歸檔日期**: 2026-04-24
-> **來源**: openspec/changes/feat-attendance-management/design.md
+> **來源**: openspec/changes/feat-attendance-management/design.md, feat-attendance-correction/design.md
 > **狀態**: FINAL — 此文件為系統唯一真理來源 (Single Source of Truth)
 
 ---
@@ -151,6 +151,23 @@ attendance/
 | expires_at | DATETIME | 過期時間 |
 | used | BOOLEAN | 是否已使用 |
 
+### attendance_correction_requests
+| 欄位 | 型別 | 說明 |
+|------|------|------|
+| id | INT PK AUTO_INCREMENT | 主鍵 |
+| user_id | INT FK→users.id | 申請人 |
+| date | DATE NOT NULL | 打卡日期 |
+| correction_type | ENUM('missed_clock_in','missed_clock_out','correct_clock_in','correct_clock_out') | 類型 |
+| original_time | DATETIME NULL | 原始時間（更正用） |
+| requested_time | DATETIME NOT NULL | 申請的打卡時間 |
+| reason | TEXT | 原因 |
+| status | ENUM('pending','approved','rejected','cancelled') | 狀態 |
+| approver_id | INT FK→users.id NULL | 簽核人 |
+| approved_at | DATETIME NULL | 簽核時間 |
+| rejection_reason | TEXT NULL | 駁回理由 |
+| created_at | DATETIME | 建立時間 |
+| updated_at | DATETIME | 更新時間 |
+
 ## 4. API 規格
 
 ### Auth
@@ -177,6 +194,12 @@ attendance/
 | POST | /api/attendance/clock-out | 打卡下班 | JWT |
 | GET | /api/attendance/today | 今日打卡狀態 | JWT |
 | GET | /api/attendance/monthly | 月度出勤紀錄 | JWT |
+| POST | /api/attendance/corrections | 提交打卡補登/更正 | JWT |
+| GET | /api/attendance/corrections | 我的補登/更正紀錄 | JWT |
+| GET | /api/attendance/corrections/pending | 待簽核補登（主管） | JWT |
+| PUT | /api/attendance/corrections/:id/approve | 簽核通過 | JWT |
+| PUT | /api/attendance/corrections/:id/reject | 簽核駁回 | JWT |
+| DELETE | /api/attendance/corrections/:id | 取消申請 | JWT |
 
 ### Leave
 | 方法 | 路徑 | 說明 | 認證 |
@@ -212,6 +235,9 @@ attendance/
 | /change-password | 強制修改密碼 | requiresAuth |
 | /dashboard | 首頁（打卡 + 今日狀態） | requiresAuth |
 | /attendance/monthly | 月度出勤紀錄 | requiresAuth |
+| /attendance/correction/apply | 申請打卡補登/更正 | requiresAuth |
+| /attendance/correction/records | 我的補登紀錄 | requiresAuth |
+| /attendance/correction/approvals | 待簽核補登單（主管） | requiresAuth |
 | /leave/apply | 請假申請 | requiresAuth |
 | /leave/records | 我的請假紀錄 | requiresAuth |
 | /leave/approvals | 待簽核假單（主管） | requiresAuth |
@@ -238,7 +264,15 @@ attendance/
 ### 補休
 加班申請簽核通過後，自動將 `overtime_requests.hours` 累加到 `leave_balances` 中對應的補休額度（`total_hours` 增加）。
 
-## 7. Email 通知觸發點
+## 7. 打卡補登/更正規則
+
+- **時效限制**: 只能申請當月份的紀錄
+- **簽核流程**: 全部都需要主管簽核
+- **類型**: missed_clock_in / missed_clock_out / correct_clock_in / correct_clock_out
+- **防護**: 同一天同一類型不可重複提交 pending 申請
+- **核准寫入**: missed→INSERT/UPDATE attendance_records, correct→UPDATE 對應欄位
+
+## 8. Email 通知觸發點
 
 | 觸發事件 | 收件人 | 實作函式 |
 |---------|--------|---------|
